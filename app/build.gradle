@@ -46,6 +46,7 @@ dependencies {
     compile 'com.google.code.gson:gson:2.8.1'
     compile 'com.android.volley:volley:1.1.0'
     compile 'com.squareup.picasso:picasso:2.71828'
+    compile 'com.ibm.watson.developer_cloud:java-sdk:3.4.0'
     compile 'com.android.support:appcompat-v7:27.+'
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
     compile 'com.android.support:design:27.+'

@@ -39,7 +39,17 @@
         </android.support.design.widget.CollapsingToolbarLayout>
     </android.support.design.widget.AppBarLayout>
 
-    <include layout="@layout/content_article_detail" />
+    <Button
+        style="@style/Widget.AppCompat.Button.Colored"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_gravity="bottom"
+        android:layout_margin="@dimen/text_margin"
+        android:textColor="@android:color/white"
+        android:background="@color/colorAccent"
+        android:text="Read More"
+        android:textAppearance="@style/TextAppearance.AppCompat.Widget.Button" />
+
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"
@@ -49,5 +59,7 @@
         app:layout_anchor="@id/app_bar"
         app:layout_anchorGravity="bottom|end"
         app:srcCompat="@drawable/ic_headset_white_24px" />
+
+    <include layout="@layout/content_article_detail" />
 
 </android.support.design.widget.CoordinatorLayout>
