@@ -2,6 +2,7 @@ package com.news.dhruvkalia.news_on_the_go;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
@@ -85,7 +86,7 @@ public class ArticleAdapter extends RecyclerView.Adapter<ArticleAdapter.MyViewHo
                 public void onClick(View v) {
 
                     Intent intent = new Intent(context, ArticleDetailActivity.class );
-                    intent.putExtra("url", article.getUrl());
+                    intent.putExtra("article", article);
                     context.startActivity(intent);
                 }
             });

@@ -7,8 +7,9 @@
     tools:context="com.news.dhruvkalia.news_on_the_go.ArticleDetailActivity">
 
 
-    <WebView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/web_view"></WebView>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/text_view"
+        android:text="Hellp"/>
 </android.support.constraint.ConstraintLayout>
