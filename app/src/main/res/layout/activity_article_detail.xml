@@ -39,17 +39,41 @@
         </android.support.design.widget.CollapsingToolbarLayout>
     </android.support.design.widget.AppBarLayout>
 
-    <Button
-        style="@style/Widget.AppCompat.Button.Colored"
+    <include layout="@layout/content_article_detail" />
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="50dp"
+        android:orientation="horizontal"
         android:layout_gravity="bottom"
         android:layout_margin="@dimen/text_margin"
-        android:textColor="@android:color/white"
-        android:background="@color/colorAccent"
-        android:text="Read More"
-        android:textAppearance="@style/TextAppearance.AppCompat.Widget.Button" />
+        android:weightSum="10">
 
+        <Button
+            style="@style/Widget.AppCompat.Button.Colored"
+            android:layout_width="match_parent"
+            android:textColor="@android:color/white"
+            android:layout_height="match_parent"
+            android:background="@color/colorAccent"
+            android:text="Read More"
+            android:layout_marginRight="5dp"
+            android:id="@+id/article_detail_read_more"
+            android:layout_weight="9"
+            android:textAppearance="@style/TextAppearance.AppCompat.Widget.Button" />
+
+
+        <android.support.design.widget.FloatingActionButton
+            android:layout_weight="1"
+            android:id="@+id/article_detail_save_article"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_anchor="@id/app_bar"
+            android:layout_gravity="end"
+            app:fabSize="normal"
+            android:visibility="visible"
+            app:srcCompat="@drawable/ic_get_app_white_24dp" />
+
+    </LinearLayout>
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"
@@ -60,6 +84,5 @@
         app:layout_anchorGravity="bottom|end"
         app:srcCompat="@drawable/ic_headset_white_24px" />
 
-    <include layout="@layout/content_article_detail" />
 
 </android.support.design.widget.CoordinatorLayout>

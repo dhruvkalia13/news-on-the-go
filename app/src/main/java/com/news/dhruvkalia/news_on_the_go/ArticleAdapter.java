@@ -43,7 +43,7 @@ public class ArticleAdapter extends RecyclerView.Adapter<ArticleAdapter.MyViewHo
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ArticleAdapter.MyViewHolder myViewHolder, int i) {
+    public void onBindViewHolder(@NonNull ArticleAdapter.MyViewHolder myViewHolder, final int i) {
 
         /*// if last element is going to be binded
         if(i == (numberOfPages*20) - 1 ){
@@ -86,7 +86,7 @@ public class ArticleAdapter extends RecyclerView.Adapter<ArticleAdapter.MyViewHo
                 public void onClick(View v) {
 
                     Intent intent = new Intent(context, ArticleDetailActivity.class );
-                    intent.putExtra("article", article);
+                    intent.putExtra("title",article.getTitle());
                     context.startActivity(intent);
                 }
             });

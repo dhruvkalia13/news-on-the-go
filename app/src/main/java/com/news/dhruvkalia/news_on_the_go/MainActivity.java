@@ -1,6 +1,7 @@
 package com.news.dhruvkalia.news_on_the_go;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -12,6 +13,8 @@ import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
@@ -51,6 +54,11 @@ public class MainActivity extends AppCompatActivity implements NextPageListener{
     private LinearLayoutManager layoutManager;
     private Context globalContext = this;
     private ArticleAdapter articleAdapter;
+    private NewsDataShare newsDataShare;
+
+    private ImageView noInternet;
+    private TextView seeOffline;
+    public static boolean internetAvailableFlag = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,7 +67,18 @@ public class MainActivity extends AppCompatActivity implements NextPageListener{
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        newsDataShare = NewsDataShare.getSharedInstance();
+
         parentRecyclerView = findViewById(R.id.parent_recycler_view);
+        noInternet = findViewById(R.id.main_activity_no_internet);
+        seeOffline = findViewById(R.id.main_activity_see_article_offline);
+
+        seeOffline.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MainActivity.this,SavedArticlesActivity.class));
+            }
+        });
 
        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -123,8 +142,8 @@ public class MainActivity extends AppCompatActivity implements NextPageListener{
     public void getResponsesFromNewsApi(int pageNumber, final Context context){
 
 //        https://newsapi.org/v2/top-headlines?country=us&page=2&apiKey=fbf9c6c019f842899dbdcddf469817ce1
-//        String URL =  "https://newsapi.org/v2/everything?q=insurance&page=" + pageNumber + "&apiKey=fbf9c6c019f842899dbdcddf469817ce";
-        String URL = "https://newsapi.org/v2/top-headlines?country=us&page=" + pageNumber + "&apiKey=fbf9c6c019f842899dbdcddf469817ce";
+        String URL =  "https://newsapi.org/v2/everything?q=insurance&page=" + pageNumber + "&apiKey=fbf9c6c019f842899dbdcddf469817ce";
+//        String URL = "https://newsapi.org/v2/top-headlines?country=us&page=" + pageNumber + "&apiKey=fbf9c6c019f842899dbdcddf469817ce";
         Log.v(TAG,"URL is " + URL);
 
         RequestQueue queue = Volley.newRequestQueue(context);
@@ -136,11 +155,18 @@ public class MainActivity extends AppCompatActivity implements NextPageListener{
                 Log.d(TAG, "response from server for retrieving=" + response);
 
                 isLoading = false;
+                internetAvailableFlag = true;
                 try {
+                    noInternet.setVisibility(View.GONE);
+                    seeOffline.setVisibility(View.GONE);
+                    parentRecyclerView.setVisibility(View.VISIBLE);
+
                     JSONObject obj = new JSONObject(response);
                     Gson gson = new Gson();
 
                     MainPojoResponse mainPojoResponse = gson.fromJson(obj.toString(), MainPojoResponse.class);
+
+                    newsDataShare.mainPojoResponse = mainPojoResponse;
 
                     setRecyclerView(mainPojoResponse, context);
                 } catch (JSONException ex) {
@@ -155,6 +181,11 @@ public class MainActivity extends AppCompatActivity implements NextPageListener{
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
+                internetAvailableFlag = false;
+                noInternet.setVisibility(View.VISIBLE);
+                seeOffline.setVisibility(View.VISIBLE);
+                parentRecyclerView.setVisibility(View.GONE);
+
                 Log.d(TAG, "response from server for retrieve=error=" + error);
 
                 if (error instanceof TimeoutError || error instanceof NoConnectionError) {
@@ -200,7 +231,8 @@ public class MainActivity extends AppCompatActivity implements NextPageListener{
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_saved_articles) {
+            startActivity(new Intent(MainActivity.this, SavedArticlesActivity.class));
             return true;
         }
 

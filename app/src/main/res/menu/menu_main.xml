@@ -2,8 +2,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.news.dhruvkalia.news_on_the_go.MainActivity" >
-    <item android:id="@+id/action_settings"
-        android:title="@string/action_settings"
-        android:orderInCategory="100"
-        app:showAsAction="never" />
+    <item android:id="@+id/action_saved_articles"
+        android:title="@string/saved_articles"
+        app:showAsAction="always"
+        android:icon="@drawable/ic_favorite_black_24dp"/>
 </menu>

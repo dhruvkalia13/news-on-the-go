@@ -24,7 +24,12 @@
         <activity
             android:name=".ArticleDetailActivity"
             android:label="@string/title_activity_article_detail"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".SavedArticlesActivity"
+            android:label="@string/saved_articles_activity"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".WebViewActivity"></activity>
     </application>
 
 </manifest>
