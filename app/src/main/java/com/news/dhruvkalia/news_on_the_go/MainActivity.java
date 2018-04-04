@@ -122,7 +122,9 @@ public class MainActivity extends AppCompatActivity implements NextPageListener{
     @Override
     public void getResponsesFromNewsApi(int pageNumber, final Context context){
 
-        String URL =  "https://newsapi.org/v2/everything?q=insurance&page=" + pageNumber + "&apiKey=fbf9c6c019f842899dbdcddf469817ce";
+//        https://newsapi.org/v2/top-headlines?country=us&page=2&apiKey=fbf9c6c019f842899dbdcddf469817ce1
+//        String URL =  "https://newsapi.org/v2/everything?q=insurance&page=" + pageNumber + "&apiKey=fbf9c6c019f842899dbdcddf469817ce";
+        String URL = "https://newsapi.org/v2/top-headlines?country=us&page=" + pageNumber + "&apiKey=fbf9c6c019f842899dbdcddf469817ce";
         Log.v(TAG,"URL is " + URL);
 
         RequestQueue queue = Volley.newRequestQueue(context);
