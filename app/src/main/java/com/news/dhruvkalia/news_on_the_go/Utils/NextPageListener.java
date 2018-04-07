@@ -1,4 +1,4 @@
-package com.news.dhruvkalia.news_on_the_go;
+package com.news.dhruvkalia.news_on_the_go.Utils;
 
 import android.content.Context;
 
@@ -8,5 +8,5 @@ import android.content.Context;
 
 public interface NextPageListener {
 
-    public void getResponsesFromNewsApi(int pageNumber, Context context);
+    void getResponsesFromNewsApi(Context context);
 }

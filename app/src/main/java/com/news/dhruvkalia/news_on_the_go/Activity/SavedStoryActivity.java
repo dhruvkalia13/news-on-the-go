@@ -1,17 +1,19 @@
-package com.news.dhruvkalia.news_on_the_go;
+package com.news.dhruvkalia.news_on_the_go.Activity;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 
+import com.news.dhruvkalia.news_on_the_go.Adapters.StoryAdapter;
 import com.news.dhruvkalia.news_on_the_go.Model.Article;
+import com.news.dhruvkalia.news_on_the_go.Model.Story;
+import com.news.dhruvkalia.news_on_the_go.Utils.NewsDataShare;
+import com.news.dhruvkalia.news_on_the_go.R;
+
 import android.speech.tts.TextToSpeech;
-import java.util.Locale;
 
 
 import java.util.ArrayList;
@@ -21,7 +23,7 @@ import io.realm.Realm;
 import io.realm.RealmConfiguration;
 import io.realm.RealmResults;
 
-public class SavedArticlesActivity extends AppCompatActivity {
+public class SavedStoryActivity extends AppCompatActivity {
 
     private TextToSpeech textToSpeech;
 
@@ -32,7 +34,7 @@ public class SavedArticlesActivity extends AppCompatActivity {
     private int pageNumber = 1;
     private LinearLayoutManager layoutManager;
     private Context globalContext = this;
-    private ArticleAdapter articleAdapter;
+    private StoryAdapter storyAdapter;
     private NewsDataShare newsDataShare;
 
     @Override
@@ -48,17 +50,17 @@ public class SavedArticlesActivity extends AppCompatActivity {
         layoutManager = new LinearLayoutManager(this);
         parentRecyclerView.setLayoutManager(layoutManager);
 
-        RealmConfiguration realmConfiguration = new RealmConfiguration.Builder(this).build();
+        RealmConfiguration realmConfiguration = new RealmConfiguration.Builder(this).deleteRealmIfMigrationNeeded().build();
 
         Realm realm;
         Realm.setDefaultConfiguration(realmConfiguration);
         realm = Realm.getDefaultInstance();
 
 
-        RealmResults<Article> results = realm.where(Article.class).findAll();
+        RealmResults<Story> results = realm.where(Story.class).findAll();
 
-        articleAdapter = new ArticleAdapter(results, globalContext);
-        parentRecyclerView.setAdapter(articleAdapter);
+        storyAdapter = new StoryAdapter(results, globalContext);
+        parentRecyclerView.setAdapter(storyAdapter);
     }
 
 }

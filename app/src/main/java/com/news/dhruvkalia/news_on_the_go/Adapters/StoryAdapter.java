@@ -1,8 +1,7 @@
-package com.news.dhruvkalia.news_on_the_go;
+package com.news.dhruvkalia.news_on_the_go.Adapters;
 
 import android.content.Context;
 import android.content.Intent;
-import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
@@ -13,7 +12,9 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.news.dhruvkalia.news_on_the_go.Model.Article;
+import com.news.dhruvkalia.news_on_the_go.Activity.StoryDetailActivity;
+import com.news.dhruvkalia.news_on_the_go.Model.Story;
+import com.news.dhruvkalia.news_on_the_go.R;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -22,28 +23,28 @@ import java.util.List;
  * Created by Dhruv Kalia on 3/29/2018.
  */
 
-public class ArticleAdapter extends RecyclerView.Adapter<ArticleAdapter.MyViewHolder> {
+public class StoryAdapter extends RecyclerView.Adapter<StoryAdapter.MyViewHolder> {
 
-    private List<Article> articleList;
+    private List<Story> storyList;
     private Context context;
 
 
-    public ArticleAdapter(List<Article> articleList, Context context) {
-        this.articleList = articleList;
+    public StoryAdapter(List<Story> storyList, Context context) {
+        this.storyList = storyList;
         this.context = context;
     }
 
     @NonNull
     @Override
-    public ArticleAdapter.MyViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
+    public StoryAdapter.MyViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
         View itemView = LayoutInflater.from(viewGroup.getContext())
-                .inflate(R.layout.article_card, viewGroup, false);
+                .inflate(R.layout.story_card, viewGroup, false);
 
         return new MyViewHolder(itemView);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ArticleAdapter.MyViewHolder myViewHolder, final int i) {
+    public void onBindViewHolder(@NonNull StoryAdapter.MyViewHolder myViewHolder, final int i) {
 
         /*// if last element is going to be binded
         if(i == (numberOfPages*20) - 1 ){
@@ -52,41 +53,43 @@ public class ArticleAdapter extends RecyclerView.Adapter<ArticleAdapter.MyViewHo
                 listener.getResponsesFromNewsApi(numberOfPages+1, context);
         } else */
         {
-            final Article article = articleList.get(i);
+            final Story story = storyList.get(i);
 
             try {
-                myViewHolder.cardArticleTitle.setText(article.getTitle());
-                myViewHolder.cardArticleDescription.setText(article.getDescription());
-                myViewHolder.cardArticleAuthor.setText(article.getAuthor());
-                myViewHolder.cardArticleTime.setText(article.getPublishedAt());
+                myViewHolder.cardArticleTitle.setText(story.getTitle());
+                myViewHolder.cardArticleDescription.setText(story.getBody());
+                myViewHolder.cardArticleAuthor.setText(story.getAuthor().getName());
+                myViewHolder.cardArticleTime.setText(story.getPublishedAt());
             }catch (NullPointerException ex){
-                Log.e("ArticleAdapter", "NullPointerException is " + ex);
+                Log.e("StoryAdapter", "NullPointerException is " + ex);
             }catch (IllegalArgumentException ex){
-                Log.e("ArticleAdapter", "IllegalArgumentException is " + ex);
+                Log.e("StoryAdapter", "IllegalArgumentException is " + ex);
             }catch (Exception ex){
-                Log.e("ArticleAdapter", "Exception is " + ex);
+                Log.e("StoryAdapter", "Exception is " + ex);
             }
 
             try{
                 Picasso.get()
-                        .load(article.getUrlToImage())
+                        .load(story.getMedia().get(0).getUrl())
                         .resize(100, 100)
                         .centerCrop()
                         .into(myViewHolder.cardArticleImage);
 
 
             }catch (NullPointerException ex){
-                Log.e("ArticleAdapter", "NullPointerException is " + ex);
+                Log.e("StoryAdapter", "NullPointerException is " + ex);
             }catch (IllegalArgumentException ex){
-                Log.e("ArticleAdapter", "IllegalArgumentException is " + ex);
+                Log.e("StoryAdapter", "IllegalArgumentException is " + ex);
+            }catch (Exception ex){
+                Log.e("StoryAdapter", "Exception is " + ex);
             }
 
             myViewHolder.cardArticle.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
 
-                    Intent intent = new Intent(context, ArticleDetailActivity.class );
-                    intent.putExtra("title",article.getTitle());
+                    Intent intent = new Intent(context, StoryDetailActivity.class );
+                    intent.putExtra("id",story.getId());
                     context.startActivity(intent);
                 }
             });
@@ -97,7 +100,7 @@ public class ArticleAdapter extends RecyclerView.Adapter<ArticleAdapter.MyViewHo
 
     @Override
     public int getItemCount() {
-        return articleList.size();
+        return storyList.size();
     }
 
     public class MyViewHolder extends RecyclerView.ViewHolder {

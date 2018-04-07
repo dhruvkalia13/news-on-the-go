@@ -1,4 +1,4 @@
-package com.news.dhruvkalia.news_on_the_go;
+package com.news.dhruvkalia.news_on_the_go.Utils;
 
 import com.news.dhruvkalia.news_on_the_go.Model.MainPojoResponse;
 

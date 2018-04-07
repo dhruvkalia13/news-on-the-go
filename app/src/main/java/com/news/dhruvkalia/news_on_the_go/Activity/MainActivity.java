@@ -1,4 +1,4 @@
-package com.news.dhruvkalia.news_on_the_go;
+package com.news.dhruvkalia.news_on_the_go.Activity;
 
 import android.content.Context;
 import android.content.Intent;
@@ -31,11 +31,15 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
-import com.news.dhruvkalia.news_on_the_go.Model.Article;
+import com.news.dhruvkalia.news_on_the_go.Adapters.StoryAdapter;
 import com.news.dhruvkalia.news_on_the_go.Model.MainPojoResponse;
+import com.news.dhruvkalia.news_on_the_go.Model.Story;
+import com.news.dhruvkalia.news_on_the_go.Utils.NextPageListener;
+import com.news.dhruvkalia.news_on_the_go.R;
+import com.news.dhruvkalia.news_on_the_go.Utils.NewsDataShare;
 
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -44,22 +48,26 @@ import java.util.Map;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class MainActivity extends AppCompatActivity implements NextPageListener{
+public class MainActivity extends AppCompatActivity implements NextPageListener {
 
     RecyclerView parentRecyclerView;
-    List<Article> masterArticleList = new ArrayList<Article>();
+    List<Story> masterStoryList = new ArrayList<>();
     private String TAG = "MainActivity.java";
     private boolean isLoading = false;
-    private int pageNumber = 1;
+//    private int pageNumber = 1;
     private LinearLayoutManager layoutManager;
     private Context globalContext = this;
-    private ArticleAdapter articleAdapter;
+    private StoryAdapter storyAdapter;
     private NewsDataShare newsDataShare;
 
     private ImageView noInternet;
     private TextView seeOffline;
     public static boolean internetAvailableFlag = false;
+    private static final String AYLIEN_APPLICATION_ID = "4c50fc3b";
+    private static final String AYLIEN_APPLICATION_KEY = "c8ea3419e09f7bbc67e542dea1705a18";
+    int numberOfCallsToApi = 0;
 
+    private String cursor = "*";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -76,7 +84,7 @@ public class MainActivity extends AppCompatActivity implements NextPageListener{
         seeOffline.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(MainActivity.this,SavedArticlesActivity.class));
+                startActivity(new Intent(MainActivity.this,SavedStoryActivity.class));
             }
         });
 
@@ -92,8 +100,8 @@ public class MainActivity extends AppCompatActivity implements NextPageListener{
         layoutManager = new LinearLayoutManager(this);
         parentRecyclerView.setLayoutManager(layoutManager);
 
-        articleAdapter = new ArticleAdapter(masterArticleList, globalContext);
-        parentRecyclerView.setAdapter(articleAdapter);
+        storyAdapter = new StoryAdapter(masterStoryList, globalContext);
+        parentRecyclerView.setAdapter(storyAdapter);
 
         parentRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
@@ -110,49 +118,55 @@ public class MainActivity extends AppCompatActivity implements NextPageListener{
                 int pastVisibleItems = layoutManager.findFirstVisibleItemPosition();
                 if (pastVisibleItems + visibleItemCount >= totalItemCount) {
                     //End of list
-                    getResponsesFromNewsApi(++pageNumber, globalContext);
+                    getResponsesFromNewsApi(globalContext);
 
                 }
             }
         });
 
-        getResponsesFromNewsApi(pageNumber, globalContext);
+        getResponsesFromNewsApi(globalContext);
 
     }
 
+/*
     private void setRecyclerView(MainPojoResponse mainPojoResponse, final Context context){
 
-        if((mainPojoResponse.getStatus()).equals("ok")){
-            masterArticleList.addAll(mainPojoResponse.getArticles());
-            /*List<Article> mList = mainPojoResponse.getArticles();
-            for (Article article: mList
-                 ) {
-                masterArticleList.add(article);
-            }*/
-            Log.v(TAG,"Now, masterArticleList contains " + masterArticleList.size() + " articles");
-
-            articleAdapter.notifyDataSetChanged();
-        } else{
-            Toast.makeText(getApplicationContext(),"STATUS IS NOT OK", Toast.LENGTH_SHORT).show();
-        }
     }
+*/
 
 
     @Override
-    public void getResponsesFromNewsApi(int pageNumber, final Context context){
+    public void getResponsesFromNewsApi(final Context context){
 
-//        https://newsapi.org/v2/top-headlines?country=us&page=2&apiKey=fbf9c6c019f842899dbdcddf469817ce1
-        String URL =  "https://newsapi.org/v2/everything?q=insurance&page=" + pageNumber + "&apiKey=fbf9c6c019f842899dbdcddf469817ce";
-//        String URL = "https://newsapi.org/v2/top-headlines?country=us&page=" + pageNumber + "&apiKey=fbf9c6c019f842899dbdcddf469817ce";
-        Log.v(TAG,"URL is " + URL);
+//        String URL = "https://api.newsapi.aylien.com/api/v1/stories";
+        String URL = null;
+
+        if(cursor.equals("*")){
+            URL = "https://api.newsapi.aylien.com/api/v1/stories?text=\"insurance\"&language[]=en&published_at.start=NOW-30DAYS&published_at.end=NOW&entities.title.text[]=\"insurance\"&per_page=10";
+        }else {
+            try {
+
+                cursor = URLEncoder.encode(cursor, "UTF-8");
+                URL = "https://api.newsapi.aylien.com/api/v1/stories?text=\"insurance\"&language[]=en&published_at.start=NOW-30DAYS&published_at.end=NOW&entities.title.text[]=\"insurance\"&per_page=10" +
+                        "&cursor=" + cursor;
+                Log.v(TAG,"URL is " + URL);
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+                Log.d(TAG,"Issue while encoding" + e.getMessage());
+            }
+        }
+
 
         RequestQueue queue = Volley.newRequestQueue(context);
         isLoading = true;
+        numberOfCallsToApi++;
+        final int finalNumberOfCallsToApi = numberOfCallsToApi;
         StringRequest sr = new StringRequest(Request.Method.GET, URL, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
 
-                Log.d(TAG, "response from server for retrieving=" + response);
+                Log.d("alien", "response from server for retrieving=" + response);
+                Log.d(TAG,"#" + finalNumberOfCallsToApi + "call to API");
 
                 isLoading = false;
                 internetAvailableFlag = true;
@@ -166,9 +180,18 @@ public class MainActivity extends AppCompatActivity implements NextPageListener{
 
                     MainPojoResponse mainPojoResponse = gson.fromJson(obj.toString(), MainPojoResponse.class);
 
-                    newsDataShare.mainPojoResponse = mainPojoResponse;
 
-                    setRecyclerView(mainPojoResponse, context);
+                    masterStoryList.addAll(mainPojoResponse.getStories());
+                    storyAdapter.notifyDataSetChanged();
+
+                    newsDataShare.mainPojoResponse = mainPojoResponse;
+                    //updating singleton object with COMPLETE data of stories
+                    newsDataShare.mainPojoResponse.setStories(masterStoryList);
+                    newsDataShare.mainPojoResponse.setNextPageCursor(mainPojoResponse.getNextPageCursor());
+
+
+                    cursor = mainPojoResponse.getNextPageCursor();
+
                 } catch (JSONException ex) {
                     Log.d(TAG, "Retrieve json error is=" + ex);
 
@@ -205,7 +228,24 @@ public class MainActivity extends AppCompatActivity implements NextPageListener{
 
                 }
             }
-        });
+        }) {
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                /*Accept:application/json, text/xml
+                Content-Type:application/x-www-form-urlencoded
+                X-AYLIEN-NewsAPI-Application-ID:4c50fc3b
+                X-AYLIEN-NewsAPI-Application-Key:c8ea3419e09f7bbc67e542dea1705a18
+                */
+
+                Map<String, String> params = new HashMap<>();
+                params.put("Accept", "application/json, text/xml");
+                params.put("Content-Type", "application/x-www-form-urlencoded");
+                params.put("X-AYLIEN-NewsAPI-Application-ID", AYLIEN_APPLICATION_ID);
+                params.put("X-AYLIEN-NewsAPI-Application-Key", AYLIEN_APPLICATION_KEY);
+                return params;
+            }
+        };
 
         sr.setRetryPolicy(new DefaultRetryPolicy(
                 50000,
@@ -232,7 +272,7 @@ public class MainActivity extends AppCompatActivity implements NextPageListener{
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_saved_articles) {
-            startActivity(new Intent(MainActivity.this, SavedArticlesActivity.class));
+            startActivity(new Intent(MainActivity.this, SavedStoryActivity.class));
             return true;
         }
 

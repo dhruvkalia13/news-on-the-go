@@ -1,4 +1,4 @@
-package com.news.dhruvkalia.news_on_the_go;
+package com.news.dhruvkalia.news_on_the_go.Activity;
 
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -7,7 +7,6 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.transition.Visibility;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -19,8 +18,10 @@ import com.ibm.watson.developer_cloud.android.library.audio.StreamPlayer;
 import com.ibm.watson.developer_cloud.text_to_speech.v1.model.Voice;
 
 
-
 import com.news.dhruvkalia.news_on_the_go.Model.Article;
+import com.news.dhruvkalia.news_on_the_go.Model.Story;
+import com.news.dhruvkalia.news_on_the_go.Utils.NewsDataShare;
+import com.news.dhruvkalia.news_on_the_go.R;
 import com.squareup.picasso.Picasso;
 
 
@@ -38,18 +39,19 @@ watson credentions - text to speech
             "password": "pnl3xHEZT8gl"
             }*/
 
-    public class ArticleDetailActivity extends AppCompatActivity implements android.speech.tts.TextToSpeech.OnInitListener {
+    public class StoryDetailActivity extends AppCompatActivity implements android.speech.tts.TextToSpeech.OnInitListener {
 
     StreamPlayer streamPlayer;
     String username = "90dbd655-6b09-4b0a-909a-5292abeeb0eb";
     String password = "pnl3xHEZT8gl";
 
     private android.speech.tts.TextToSpeech textToSpeech;
-    private Article article = null;
+    private Story story = null;
     private FloatingActionButton headsetButton, saveButton;
 
     private Realm realm;
 
+    private String TAG = "StoryDetail.java";
     private NewsDataShare newsDataShare;
 
     @Override
@@ -59,57 +61,70 @@ watson credentions - text to speech
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
 
         setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        try{
+            getSupportActionBar().setDisplayShowTitleEnabled(false);
+        }catch (NullPointerException ex){
+            Log.d(TAG,"Exception is " + ex);
+        }
 
         headsetButton = findViewById(R.id.fab);
         saveButton = findViewById(R.id.article_detail_save_article);
 
         textToSpeech = new android.speech.tts.TextToSpeech(this,this);
 
-        String titleOfArticle = getIntent().getStringExtra("title");
+        int idOfStoryRecieved = getIntent().getIntExtra("id",0);
 
         newsDataShare = NewsDataShare.getSharedInstance();
-
 
         RealmConfiguration realmConfiguration = new RealmConfiguration.Builder(this).build();
 
         Realm.setDefaultConfiguration(realmConfiguration);
+
         realm = Realm.getDefaultInstance();
 
+        Log.d(TAG,"id of story in detail is " + idOfStoryRecieved);
+        Log.d(TAG,"Looking in singleton now... size of singeleton stories is " + newsDataShare.mainPojoResponse.getStories().size());
+
         if(newsDataShare.mainPojoResponse != null){
-            for(int i = 0; i< newsDataShare.mainPojoResponse.getArticles().size(); i++){
-                Article articleFound = newsDataShare.mainPojoResponse.getArticles().get(i);
-                if((articleFound.getTitle()).equals(titleOfArticle)){
-                    article = articleFound;
+            for(int i = 0; i< newsDataShare.mainPojoResponse.getStories().size(); i++){
+                Story storyFound = newsDataShare.mainPojoResponse.getStories().get(i);
+                if((storyFound.getId()) == (idOfStoryRecieved)){
+                    story = storyFound;
+                    Log.d(TAG,"Story found in singeleton object only: title is" + storyFound.getTitle());
                     break;
                 }
             }
         }
 
-        if(article == null && titleOfArticle != null){
+        if(story == null && idOfStoryRecieved != 0){
             //if no internet and article is being viewed from SavedArticles
+            Log.d(TAG,"Story was NOT found in singeleton");
+            Log.d(TAG,"Looking in realm now...");
 
-            RealmResults<Article> results = realm.where(Article.class).contains("title",titleOfArticle).findAll();
+            Story storyFound = realm.where(Story.class).equalTo("id",idOfStoryRecieved).findFirst();
             try{
-                article = results.get(0);
+                story = storyFound;
+                Log.d(TAG,"Found in realm...");
+
             }catch (ArrayIndexOutOfBoundsException ex){
-                Log.e("ArticleDetail","Exception is " + ex);
+                Log.e(TAG,"Exception is " + ex);
             }
 
         }
 
-            RealmResults<Article> results = realm.where(Article.class).contains("title",titleOfArticle).findAll();
+
+        Story storyFound = realm.where(Story.class).equalTo("id",idOfStoryRecieved).findFirst();
             try{
-                if(results.get(0) == null){
-                    Log.d("ArticleDetail.java", "save button VISIBLE");
+                if(storyFound == null){
+                    Log.d(TAG, "save button VISIBLE");
                     saveButton.setVisibility(View.VISIBLE);
                 } else{
-                    Log.d("ArticleDetail.java", "save button GONE");
+                    Log.d(TAG, "save button GONE");
                     saveButton.setVisibility(View.GONE);
                 }
             }catch (ArrayIndexOutOfBoundsException ex){
                 Log.e("ArticleDetail","Exception is " + ex);
-                Log.d("ArticleDetail.java", "save button VISIBLE");
+                Log.d(TAG, "save button VISIBLE");
                 saveButton.setVisibility(View.VISIBLE);
             }
 
@@ -121,28 +136,30 @@ watson credentions - text to speech
         ImageView articleDetailImage = findViewById(R.id.article_detail_image);
 
         try{
-            articleDetailTitle.setText(article.getTitle());
-            articleDetailAuthor.setText(article.getAuthor());
-            articleDetailTime.setText(article.getPublishedAt());
-            articleDetailDescription.setText(article.getDescription());
+            articleDetailTitle.setText(story.getTitle());
+            articleDetailAuthor.setText(story.getAuthor().getName());
+            articleDetailTime.setText(story.getPublishedAt());
+            articleDetailDescription.setText(story.getBody());
         } catch (NullPointerException ex){
-            Log.e("ArticleDetailActivity", "NullPointerException is " + ex);
+            Log.e("StoryDetailActivity", "NullPointerException is " + ex);
         }catch (IllegalArgumentException ex){
-            Log.e("ArticleDetailActivity", "IllegalArgumentException is " + ex);
+            Log.e("StoryDetailActivity", "IllegalArgumentException is " + ex);
         }catch (Exception ex){
-            Log.e("ArticleDetailActivity", "Exception is " + ex);
+            Log.e("StoryDetailActivity", "Exception is " + ex);
         }
 
 
         try{
             Picasso.get()
-                    .load(article.getUrlToImage())
+                    .load(story.getMedia().get(0).getUrl())
                     .into(articleDetailImage);
 
         }catch (NullPointerException ex){
-            Log.e("ArticleAdapter", "NullPointerException is " + ex);
+            Log.e("StoryAdapter", "NullPointerException is " + ex);
         }catch (IllegalArgumentException ex){
-            Log.e("ArticleAdapter", "IllegalArgumentException is " + ex);
+            Log.e("StoryAdapter", "IllegalArgumentException is " + ex);
+        }catch (Exception ex){
+            Log.e("StoryAdapter", "Exception is " + ex);
         }
 
         headsetButton.setOnClickListener(new View.OnClickListener() {
@@ -165,21 +182,43 @@ watson credentions - text to speech
             @Override
             public void onClick(View v) {
 
+                Log.d(TAG,"Current story's title is " + story.getTitle());
 
-                realm.beginTransaction();
-                realm.copyToRealm(article);
-                realm.commitTransaction();
-                Snackbar.make(v, "Article is saved. You can view it in offline mode.", Snackbar.LENGTH_LONG)
-                        .setAction("View Offline", new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                startActivity(new Intent(ArticleDetailActivity.this, SavedArticlesActivity.class));
-                            }
-                        }).show();
+                try{
+                    Story storyFound = realm.where(Story.class).equalTo("id",story.getId()).findFirst();
+                    if(storyFound != null){
+                        //Story already exists
+                        saveButton.setVisibility(View.GONE);
+                        Snackbar.make(v, "Story is already saved. You can view it in offline mode.", Snackbar.LENGTH_LONG)
+                                .setAction("View Offline", new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        startActivity(new Intent(StoryDetailActivity.this, SavedStoryActivity.class));
+                                    }
+                                }).show();
+                    } else{
+                        RealmResults<Story> results = realm.where(Story.class).findAll();
+                        for(int i = 0; i < results.size(); i++){
+                            Log.d(TAG,"Saved story id of #" + i + " is " + results.get(i).getId());
+                        }
+                        Log.d(TAG,"Saving story's id is " + story.getId());
+                        realm.beginTransaction();
+                        realm.copyToRealm(story);
+                        realm.commitTransaction();
+                        Snackbar.make(v, "Story is saved. You can view it in offline mode.", Snackbar.LENGTH_LONG)
+                                .setAction("View Offline", new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        startActivity(new Intent(StoryDetailActivity.this, SavedStoryActivity.class));
+                                    }
+                                }).show();
 
-                saveButton.setVisibility(View.GONE);
-                RealmResults<Article> results = realm.where(Article.class).findAll();
-                Log.v("ArticleDetailActivity","Saved article's title is " + (results.get(0)).getTitle() + "..");
+                        saveButton.setVisibility(View.GONE);
+
+                    }
+                } catch (NullPointerException ex){
+                    Log.d(TAG,"Exception is " + ex);
+                }
 
             }
         });
@@ -194,8 +233,8 @@ watson credentions - text to speech
         readMoreButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(ArticleDetailActivity.this,WebViewActivity.class);
-                intent.putExtra("url",article.getUrl());
+                Intent intent = new Intent(StoryDetailActivity.this,WebViewActivity.class);
+                intent.putExtra("url",story.getLinks().getPermalink());
                 startActivity(intent);
             }
         });
@@ -222,8 +261,8 @@ watson credentions - text to speech
             com.ibm.watson.developer_cloud.text_to_speech.v1.TextToSpeech textToSpeech = initTextToSpeechService();
             streamPlayer = new StreamPlayer();
 
-            streamPlayer.playStream(textToSpeech.synthesize(article.getTitle(), Voice.EN_LISA).execute());
-            streamPlayer.playStream(textToSpeech.synthesize(article.getDescription(), Voice.EN_LISA).execute());
+            streamPlayer.playStream(textToSpeech.synthesize(story.getTitle(), Voice.EN_LISA).execute());
+            streamPlayer.playStream(textToSpeech.synthesize(story.getBody(), Voice.EN_LISA).execute());
 
             return "text to speech done";
         }
@@ -265,7 +304,7 @@ watson credentions - text to speech
 
     private void speakOut() {
 
-        String text = article.getDescription();
+        String text = story.getBody();
 
         textToSpeech.speak(text, android.speech.tts.TextToSpeech.QUEUE_FLUSH, null);
     }

@@ -1,7 +1,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="com.news.dhruvkalia.news_on_the_go.MainActivity" >
+    tools:context="com.news.dhruvkalia.news_on_the_go.Activity.MainActivity" >
     <item android:id="@+id/action_saved_articles"
         android:title="@string/saved_articles"
         app:showAsAction="always"

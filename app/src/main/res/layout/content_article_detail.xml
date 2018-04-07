@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="com.news.dhruvkalia.news_on_the_go.ArticleDetailActivity"
+    tools:context="com.news.dhruvkalia.news_on_the_go.Activity.StoryDetailActivity"
     tools:showIn="@layout/activity_article_detail">
 
 
@@ -60,7 +60,7 @@
             android:layout_margin="@dimen/text_margin"
             android:text="abcd"
             android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-            android:textSize="24sp" />
+            android:textSize="18sp" />
 
     </LinearLayout>
 </android.support.v4.widget.NestedScrollView>

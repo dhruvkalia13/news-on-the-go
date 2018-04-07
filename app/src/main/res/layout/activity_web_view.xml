@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.news.dhruvkalia.news_on_the_go.WebViewActivity">
+    tools:context="com.news.dhruvkalia.news_on_the_go.Activity.WebViewActivity">
 
     <WebView
         android:layout_width="match_parent"
