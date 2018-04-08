@@ -25,6 +25,7 @@ import com.news.dhruvkalia.news_on_the_go.R;
 import com.squareup.picasso.Picasso;
 
 
+import java.text.DateFormatSymbols;
 import java.util.Locale;
 
 import io.realm.Realm;
@@ -138,8 +139,14 @@ watson credentions - text to speech
         try{
             articleDetailTitle.setText(story.getTitle());
             articleDetailAuthor.setText(story.getAuthor().getName());
-            articleDetailTime.setText(story.getPublishedAt());
             articleDetailDescription.setText(story.getBody());
+
+            //2016-08-22T16:46:48Z
+            String year = story.getPublishedAt().substring(0,4);
+            String monthName = (new DateFormatSymbols()).getMonths()[Integer.parseInt(story.getPublishedAt().substring(5,7)) -1];
+            String date = story.getPublishedAt().substring(8,10);
+
+            articleDetailTime.setText(monthName + " " + date + ", " + year);
         } catch (NullPointerException ex){
             Log.e("StoryDetailActivity", "NullPointerException is " + ex);
         }catch (IllegalArgumentException ex){

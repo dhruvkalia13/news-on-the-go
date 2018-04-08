@@ -17,6 +17,7 @@ import com.news.dhruvkalia.news_on_the_go.Model.Story;
 import com.news.dhruvkalia.news_on_the_go.R;
 import com.squareup.picasso.Picasso;
 
+import java.text.DateFormatSymbols;
 import java.util.List;
 
 /**
@@ -59,7 +60,13 @@ public class StoryAdapter extends RecyclerView.Adapter<StoryAdapter.MyViewHolder
                 myViewHolder.cardArticleTitle.setText(story.getTitle());
                 myViewHolder.cardArticleDescription.setText(story.getBody());
                 myViewHolder.cardArticleAuthor.setText(story.getAuthor().getName());
-                myViewHolder.cardArticleTime.setText(story.getPublishedAt());
+
+                //2016-08-22T16:46:48Z
+                String year = story.getPublishedAt().substring(0,4);
+                String monthName = (new DateFormatSymbols()).getMonths()[Integer.parseInt(story.getPublishedAt().substring(5,7)) -1];
+                String date = story.getPublishedAt().substring(8,10);
+
+                myViewHolder.cardArticleTime.setText(monthName + " " + date + ", " + year);
             }catch (NullPointerException ex){
                 Log.e("StoryAdapter", "NullPointerException is " + ex);
             }catch (IllegalArgumentException ex){
